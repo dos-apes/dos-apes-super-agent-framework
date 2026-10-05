@@ -61,7 +61,7 @@ npm install -g @openai/codex
 codex login
 ```
 
-No API key required — auth is via your ChatGPT account. The default reviewer model is **`gpt-5.5`** with `reasoning_effort: high`. Don't configure `gpt-5-codex` — that slug silently drops `--output-schema`, which breaks the structured-findings parser; the prerequisite check (`scripts/codex-check.js`) verifies the configured model actually honors structured outputs before letting the review run.
+No API key required — auth is via your ChatGPT account. The default reviewer model for new installations is **`gpt-6.1-sol`** with `reasoning_effort: high` — an explicit model ID, never a floating "latest" alias, so a review stays attributable to a known model. The installer never overwrites an existing `.dos-apes/codex-review-config.json`, so projects that already pin a model keep it. Don't configure `gpt-5-codex` — that slug silently drops `--output-schema`, which breaks the structured-findings parser; the prerequisite check (`scripts/codex-check.js`) verifies the configured model actually honors structured outputs before letting the review run.
 
 ### Install
 
@@ -342,7 +342,7 @@ Commands assemble the right team. `/apes-build` spawns lead + architect + builde
 
 ### Cross-Model Review (L8)
 
-L8 is opt-in cross-model review. A second model (Codex CLI, default `gpt-5.5`) reads the diff produced by the first model (Claude) and emits structured findings against a JSON schema. Two different models catching each other's blind spots is more robust than one model reviewing its own work.
+L8 is opt-in cross-model review. A second model (Codex CLI, default `gpt-6.1-sol`) reads the diff produced by the first model (Claude) and emits structured findings against a JSON schema. Two different models catching each other's blind spots is more robust than one model reviewing its own work.
 
 **The contract:**
 

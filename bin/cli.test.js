@@ -421,6 +421,52 @@ group("packaging (npm pack --dry-run --json)", () => {
   });
 });
 
+// ─── Installer — L8 config across a default change (M-0008) ──────────────────
+//
+// Changing the shipped reviewer default must reach new installations only. A
+// project that already has .dos-apes/codex-review-config.json — selecting any
+// model — keeps it byte-for-byte across a reinstall.
+
+group("installer — L8 config (M-0008)", () => {
+  const { spawnSync } = require("child_process");
+  const CLI = path.join(__dirname, "cli.js");
+  const TEMPLATE = path.join(REAL_FRAMEWORK_DIR, "templates", "codex-review-config.json");
+
+  function install() {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "dos-apes-cli-l8-"));
+    tmpRoots.push(dir);
+    spawnSync("git", ["init", "-q"], { cwd: dir });
+    return dir;
+  }
+
+  function runInstaller(dir) {
+    const res = spawnSync(process.execPath,
+      [CLI, "--local", "--yes", "--greenfield", "--no-ci"],
+      { cwd: dir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 120000 });
+    assert.strictEqual(res.status, 0, `installer failed: ${res.stderr || res.stdout}`);
+  }
+
+  test("a fresh install receives the shipped template unchanged", () => {
+    const dir = install();
+    runInstaller(dir);
+    const installed = path.join(dir, ".dos-apes", "codex-review-config.json");
+    assert.ok(fs.readFileSync(installed).equals(fs.readFileSync(TEMPLATE)),
+      "installed config must be the template, byte for byte");
+  });
+
+  test("an existing config selecting another model is left byte-identical", () => {
+    const dir = install();
+    const cfgDir = path.join(dir, ".dos-apes");
+    fs.mkdirSync(cfgDir);
+    const existing = Buffer.from(
+      '{\n  "enabled": true,\n  "model": "gpt-5.5",\n  "reasoning_effort": "medium"\n}\n');
+    fs.writeFileSync(path.join(cfgDir, "codex-review-config.json"), existing);
+    runInstaller(dir);
+    assert.ok(fs.readFileSync(path.join(cfgDir, "codex-review-config.json")).equals(existing),
+      "the installer must never rewrite a project's existing L8 config");
+  });
+});
+
 // ─── Summary ─────────────────────────────────────────────────────────────────
 
 cleanupFixtures();

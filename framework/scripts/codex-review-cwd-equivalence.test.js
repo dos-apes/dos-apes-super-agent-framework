@@ -184,7 +184,7 @@ function makeProject({ missionBranch, withWorktree }) {
     path.join(dosApesDir, "codex-review-config.json"),
     JSON.stringify({
       enabled: true,
-      model: "gpt-5.5",
+      model: "gpt-6.1-sol",
       diff_base: "main",
       timeout_seconds: 60,
     })
@@ -202,7 +202,7 @@ function makeProject({ missionBranch, withWorktree }) {
   fs.writeFileSync(
     path.join(dosApesDir, "codex-capabilities.json"),
     JSON.stringify({
-      model: "gpt-5.5",
+      model: "gpt-6.1-sol",
       supports_output_schema: true,
       verified_at: new Date().toISOString(),
     })

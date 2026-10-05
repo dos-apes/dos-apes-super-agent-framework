@@ -15,13 +15,19 @@ Master switch. When `false`, every entry point into L8 is a no-op. Toggle
 through `/apes-codex-review --enable` so the command can re-run the
 prerequisite check before flipping the flag.
 
-### `model` *(string, default `"gpt-5.5"`)*
+### `model` *(string, default `"gpt-6.1-sol"`)*
 The Codex model the reviewer invokes. **Do not configure `gpt-5-codex`** —
 that slug has a known issue where `--output-schema` is silently dropped, which
 breaks the structured findings parser the loop depends on. The prerequisite
 check (`scripts/codex-check.js`) verifies structured-output capability against
 the live CLI by running an actual round-trip; future Codex models that honor
 `--output-schema` will work without code changes.
+
+The default is an explicit model ID, never a floating "latest" alias, so every
+review record stays attributable to a known model. Changing the shipped default
+affects new installations only: the installer never overwrites an existing
+`.dos-apes/codex-review-config.json`, so a project that already names a model
+keeps it until you edit the file.
 
 ### `reasoning_effort` *(`"low" | "medium" | "high"`, default `"high"`)*
 Codex CLI reasoning depth. Defaults to `high` for code review even though the

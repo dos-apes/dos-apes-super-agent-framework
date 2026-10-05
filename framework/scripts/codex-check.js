@@ -22,7 +22,7 @@ const CAPABILITIES_PATH = path.join(PROJECT_ROOT, ".dos-apes", "codex-capabiliti
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const IS_WINDOWS = process.platform === "win32";
 
-const DEFAULT_MODEL = "gpt-5.5";
+const DEFAULT_MODEL = "gpt-6.1-sol";
 const VERSION_TIMEOUT_MS = 5_000;
 const AUTH_TIMEOUT_MS = 30_000;
 const CAPABILITY_TIMEOUT_MS = 90_000;
@@ -174,14 +174,14 @@ function checkCapability(model) {
       return {
         ok: false,
         code: 3,
-        message: `model ${model} does not honor --output-schema; use gpt-5.5 or another supported model`,
+        message: `model ${model} does not honor --output-schema; use gpt-6.1-sol or another supported model`,
       };
     }
     if (typeof parsed !== "object" || parsed === null || typeof parsed.ok !== "boolean") {
       return {
         ok: false,
         code: 3,
-        message: `model ${model} does not honor --output-schema; use gpt-5.5 or another supported model`,
+        message: `model ${model} does not honor --output-schema; use gpt-6.1-sol or another supported model`,
       };
     }
     return { ok: true };
@@ -272,4 +272,9 @@ function main() {
   emit({ ok: true, code: 0, message: "codex ready", model }, 0);
 }
 
-main();
+// Exposed for tests. Production CLI invocation lives behind require.main.
+module.exports = { DEFAULT_MODEL };
+
+if (require.main === module) {
+  main();
+}

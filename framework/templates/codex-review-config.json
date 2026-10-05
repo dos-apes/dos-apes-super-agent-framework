@@ -1,6 +1,6 @@
 {
   "enabled": false,
-  "model": "gpt-5.5",
+  "model": "gpt-6.1-sol",
   "reasoning_effort": "high",
   "sandbox": "read-only",
   "max_iterations": 3,

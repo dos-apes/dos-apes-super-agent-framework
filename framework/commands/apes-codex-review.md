@@ -62,7 +62,7 @@ After flipping, run the prerequisite check so the user knows whether they can ac
 node scripts/codex-check.js
 ```
 
-Expected on success: `{"ok":true,"code":0,"message":"codex ready","model":"gpt-5.5"}`.
+Expected on success: `{"ok":true,"code":0,"message":"codex ready","model":"gpt-6.1-sol"}`.
 
 ---
 
@@ -114,7 +114,7 @@ After it returns:
 
 ```
 $ /apes-codex-review
-✓ Codex CLI ready (model: gpt-5.5, cached 2026-04-30T18:22:11Z)
+✓ Codex CLI ready (model: gpt-6.1-sol, cached 2026-10-05T14:02:37Z)
 ✓ Diff: 7 files, +312/-104 vs main
 
 Verdict: accept (confidence 0.92)

@@ -6,6 +6,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed — M-0008: L8 default reviewer is `gpt-6.1-sol` at `high`
+
+- **New installations now default the L8 reviewer to `gpt-6.1-sol`** with
+  `reasoning_effort: "high"`, replacing `gpt-5.5`. The default is an explicit
+  model ID, never a floating "latest" alias. It changed together in every place
+  that states it: `codex-review.js` `DEFAULT_CONFIG`, `codex-check.js`
+  `DEFAULT_MODEL` (and its unsupported-model hint), the installed
+  `codex-review-config.json` template and its README, `/apes-codex-review`, and
+  the README.
+- **Existing projects are not modified.** The installer has always skipped an
+  existing `.dos-apes/codex-review-config.json`; a project that already names a
+  model keeps it until its owner edits the file. A project whose config omits
+  `model` falls back to the code default, so it picks up `gpt-6.1-sol` once its
+  installed scripts are updated.
+- **Unchanged:** L8 stays opt-in (`enabled: false` in the template, no `enabled`
+  key in the code defaults), the sandbox stays `read-only`, every unavailable
+  state still fails open to `skipped`, the model stays configurable, and the
+  structured-output capability check still gates the run.
+- **New regression coverage.** `codex-review.test.js` pins the code defaults,
+  the capability-check default, the template, and the template README to one
+  another. `cli.test.js` installs into a fresh project and over an existing
+  config that selects another model, and requires the latter to stay
+  byte-identical. Both suites were run against deliberate mutations to prove
+  they fail.
+- `codex-check.js` now exports `DEFAULT_MODEL` and runs `main()` only behind
+  `require.main === module`, matching `codex-review.js`. CLI behaviour is
+  unchanged.
+
 ### Fixed — M-0007: `codex.required` completion gate
 
 Discovered by dogfooding in Dos Apes Coding Troop, where it blocked closeout of
