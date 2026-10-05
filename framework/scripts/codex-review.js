@@ -76,7 +76,7 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 // No `enabled` key here by design (M-0005): enablement comes only from a
 // strict enabled === true on the parsed config — see codex-config.js.
 const DEFAULT_CONFIG = {
-  model: "gpt-5.5",
+  model: "gpt-6.1-sol",
   reasoning_effort: "high",
   sandbox: "read-only",
   diff_base: "main",
@@ -739,6 +739,7 @@ module.exports = {
   recordCodexReview,
   countUnresolvedFindings,
   VERDICT_TO_LAST_VERDICT,
+  DEFAULT_CONFIG,
 };
 
 if (require.main === module) {

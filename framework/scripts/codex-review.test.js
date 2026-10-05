@@ -354,6 +354,57 @@ group("VERDICT_TO_LAST_VERDICT", () => {
   });
 });
 
+// ─── Shipped L8 reviewer defaults (M-0008) ─────────────────────────────────
+//
+// The reviewer default is stated in three code/config places — codex-review.js
+// DEFAULT_CONFIG, codex-check.js DEFAULT_MODEL, and the installed template —
+// plus the template README. Nothing pinned them to one another, so one could
+// move without the others; these assertions make that a failure.
+
+const SHIPPED_MODEL = "gpt-6.1-sol";
+
+group("shipped L8 reviewer defaults (M-0008)", () => {
+  const template = JSON.parse(fs.readFileSync(
+    path.join(__dirname, "..", "templates", "codex-review-config.json"), "utf8"));
+
+  test("codex-review.js defaults to the pinned model at high effort, read-only", () => {
+    assert.strictEqual(codexReview.DEFAULT_CONFIG.model, SHIPPED_MODEL);
+    assert.strictEqual(codexReview.DEFAULT_CONFIG.reasoning_effort, "high");
+    assert.strictEqual(codexReview.DEFAULT_CONFIG.sandbox, "read-only");
+  });
+
+  test("codex-review.js defaults carry no enabled key (M-0005 opt-in preserved)", () => {
+    assert.ok(!("enabled" in codexReview.DEFAULT_CONFIG),
+      "enablement must come only from an explicit enabled === true in the config");
+  });
+
+  test("codex-check.js capability-checks the same default model", () => {
+    const { DEFAULT_MODEL } = require("./codex-check.js");
+    assert.strictEqual(DEFAULT_MODEL, codexReview.DEFAULT_CONFIG.model);
+  });
+
+  test("installed template ships disabled, pinned model, high effort, read-only", () => {
+    assert.strictEqual(template.enabled, false);
+    assert.strictEqual(template.model, SHIPPED_MODEL);
+    assert.strictEqual(template.reasoning_effort, "high");
+    assert.strictEqual(template.sandbox, "read-only");
+  });
+
+  test("the default is an explicit model ID, not a floating alias", () => {
+    for (const m of [template.model, codexReview.DEFAULT_CONFIG.model]) {
+      assert.ok(!/latest/i.test(m), `${m} must not be a floating alias`);
+      assert.match(m, /^gpt-\d+(\.\d+)?-[a-z0-9-]+$/, `${m} must be a versioned, named model ID`);
+    }
+  });
+
+  test("template README documents the same default model", () => {
+    const readme = fs.readFileSync(
+      path.join(__dirname, "..", "templates", "codex-review-config.README.md"), "utf8");
+    assert.ok(readme.includes(`default \`"${SHIPPED_MODEL}"\``),
+      "the `model` field heading must state the shipped default");
+  });
+});
+
 // ─── Cleanup + summary ─────────────────────────────────────────────────────
 
 for (const c of cleanups) {
