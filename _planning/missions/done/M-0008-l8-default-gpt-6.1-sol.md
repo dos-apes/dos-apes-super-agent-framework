@@ -6,12 +6,19 @@ labels:
   - l8
   - defaults
 depends_on: []
+state: done
+created: 2026-10-05
+updated: 2026-10-05
 codex:
-  required: true # one real L8 review with the new default is part of the proof
+  required: true
+  last_verdict: accepted
+  unresolved_findings: 0
+  last_run_at: 2026-10-05T16:21:21.742Z
 verification:
   required_levels:
     - L2
     - L8
+schema_version: 2
 ---
 
 ## Problem
@@ -126,3 +133,43 @@ The session ran with the Coding Troop's Claude Code hooks loaded. Its
 format-and-stage hook reformatted `codex-review-config.README.md` on an editor
 write; that change was discarded and the file rebuilt from `HEAD` with only
 the intended edits. All other Framework edits were made outside the hook.
+
+### Closeout (2026-10-05)
+
+- **Delivery.** PR #25 squash-merged by maintainer approval as `930dc766`
+  (2026-10-05T16:38:09Z), pinned with `--match-head-commit 03a42f9`. Before the
+  merge: head still `03a42f9`, the same three commits, CodeQL and
+  "Analyze (javascript-typescript)" both SUCCESS, 0 reviews, 0 comments, 0 open
+  code-scanning alerts on the PR ref, merge state `CLEAN`. Branch retained on
+  origin per the branch-retention policy.
+- **Merged content, by tree.** `930dc766^{tree}` equals `03a42f9^{tree}`, the
+  reviewed head. On `main`: `codex-review.js` `DEFAULT_CONFIG`
+  `gpt-6.1-sol`/`high`/`read-only`, `codex-check.js` `DEFAULT_MODEL`
+  `gpt-6.1-sol`, template `enabled:false`/`gpt-6.1-sol`/`high`/`read-only`.
+- **Post-merge verification.** `npm test` on the merged code: exit 0, 0 failed.
+- **Record repair at closeout.** The tracker refused to touch this record as
+  filed. It lacked the schema-required `state`, `created` and `updated`. Worse,
+  `required: true # …` parsed as the *string* `"true # …"`: the mission
+  parser keeps inline comments inside scalar values. As merged, the record
+  therefore never opted into the `codex.required` completion gate. Fixed here
+  by adding the missing fields and moving the comment off the value line.
+  After the fix the gate refused `review → done` at verdict `none` and allowed
+  it at `accepted`.
+- **L8 verdict recorded through `MissionTracker.setCodexState`.** Raw reviewer
+  verdict `accept` maps to `last_verdict: accepted` via
+  `VERDICT_TO_LAST_VERDICT`, with 0 unresolved findings and `last_run_at` taken
+  from the review record's timestamp. No `last_review_path`: the record is
+  local and gitignored (as for M-0001). No `human_adjudication` was needed or
+  written.
+- **Lifecycle.** `todo → doing → review → done` was walked in this closeout
+  through `moveMissionState`. The file had stayed in `todo/` while the work was
+  done, so these transitions record states already passed, not new work.
+- **Follow-up candidates, not addressed here.**
+  1. No PR-triggered workflow runs `npm test`. CodeQL is the only PR check, so
+     test evidence on a PR is local-only.
+  2. Inline `#` comments in mission frontmatter scalars are kept as part of the
+     value, which silently disables `codex.required: true` (fail-open on a
+     governance gate). `M-0001` (`required: true  # …`) and `M-0007`
+     (`required: false # …`) carry the same pattern.
+  3. The gate's refusal message prints `undefined:` where the mission ID
+     belongs.
